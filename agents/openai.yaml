@@ -1,0 +1,4 @@
+name: remotion-renderer
+display_name: "Remotion 渲染成片"
+description: "Remotion 渲染成片，用于 Shin-video 口播视频工作流的「视觉风格与渲染成片」阶段。"
+default_prompt: "请使用「Remotion 渲染成片」处理当前 Shin-video 项目，并严格遵守 SKILL.md 的输入、输出和边界要求。"
