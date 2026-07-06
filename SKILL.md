@@ -53,7 +53,24 @@ runtime/preview.mp4
 node -v
 npm -v
 npx remotion --version
+npm ls zod @remotion/bundler @remotion/cli @remotion/renderer remotion --depth=0
 ffmpeg -version
+```
+
+Remotion 依赖必须版本对齐。当前 Shin-video 模板要求：
+
+```text
+remotion 4.0.484
+@remotion/cli 4.0.484
+@remotion/bundler 4.0.484
+@remotion/renderer 4.0.484
+zod 4.3.6
+```
+
+如果出现 `Remotion version mismatch`、`zod` 版本不符合要求，或 Remotion 四个包版本不一致，先修依赖再渲染：
+
+```bash
+npm install zod@4.3.6 remotion@4.0.484 @remotion/cli@4.0.484 @remotion/bundler@4.0.484 @remotion/renderer@4.0.484 --save-exact
 ```
 
 如果 `npx remotion --version` 失败，先读取：
@@ -71,7 +88,7 @@ npm install
 如果仍缺 Remotion：
 
 ```bash
-npm install remotion @remotion/cli @remotion/renderer @remotion/bundler
+npm install remotion@4.0.484 @remotion/cli@4.0.484 @remotion/renderer@4.0.484 @remotion/bundler@4.0.484 zod@4.3.6 --save-exact
 ```
 
 ## 渲染规则

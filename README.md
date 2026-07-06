@@ -46,6 +46,18 @@ runtime/preview.mp4
 
 WhisperX、Remotion、faster-whisper 不是 ThinkAI 自研，也不是本仓库自研。
 
+Remotion 渲染前必须检查依赖版本：
+
+```bash
+npm ls zod @remotion/bundler @remotion/cli @remotion/renderer remotion --depth=0
+```
+
+当前 Shin-video 模板要求 Remotion 4.0.484 与 `zod` 4.3.6。如果出现 `Remotion version mismatch`、`zod` 版本不一致，或 Remotion 四个包版本不一致，先执行：
+
+```bash
+npm install zod@4.3.6 remotion@4.0.484 @remotion/cli@4.0.484 @remotion/bundler@4.0.484 @remotion/renderer@4.0.484 --save-exact
+```
+
 ## 能力边界
 
 - v1 不把图片链路作为必要步骤。

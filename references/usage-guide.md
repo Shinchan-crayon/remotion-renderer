@@ -35,8 +35,21 @@
 - FFmpeg 可用；
 - WhisperX 和 faster-whisper 模型可用；
 - Remotion 和 Shin-video 视频模板可用；
+- Remotion 4.0.484 与 `zod` 4.3.6 版本对齐；
 - 用户已经提供文章或文章链接；
 - 用户确认后的口播音频命名为 `口播音频.mp3`。
+
+渲染前执行：
+
+```bash
+npm ls zod @remotion/bundler @remotion/cli @remotion/renderer remotion --depth=0
+```
+
+如果出现 `Remotion version mismatch` 或 `zod` 版本不一致，先执行：
+
+```bash
+npm install zod@4.3.6 remotion@4.0.484 @remotion/cli@4.0.484 @remotion/bundler@4.0.484 @remotion/renderer@4.0.484 --save-exact
+```
 
 ## 失败处理
 
