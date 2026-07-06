@@ -5,6 +5,8 @@ description: 调用 Remotion 使用 runtime/scenes.json、runtime/style-profile.
 
 # Remotion 渲染成片
 
+这是场景四第 9 步，只能在 `style-consultant` 和 `animation-preset-builder` 完成之后执行。
+
 调用 Remotion 渲染视频。
 
 ## 输入
@@ -14,6 +16,20 @@ runtime/scenes.json
 runtime/style-profile.json
 口播音频.mp3
 ```
+
+## 渲染前检查
+
+渲染前必须检查：
+
+- 必须存在 `runtime/scenes.json`
+- 必须存在 `runtime/style-profile.json`
+- 必须存在 `口播音频.mp3`
+- `runtime/style-profile.json` 必须包含 `styleProfileVersion`
+- `runtime/style-profile.json` 必须包含可执行视觉配置，而不是只有中文描述
+
+缺少 runtime/style-profile.json 时，停止渲染，回到 `style-consultant` 和 `animation-preset-builder`，先询问视觉风格并生成配置。
+
+Remotion 模板必须读取 `runtime/style-profile.json` 并把其中的 `visualFoundation`、`motionSystem`、`effectsSystem`、`transitionSystem` 应用到画面。如果模板没有读取这个文件，禁止继续渲染或交付。
 
 ## 输出
 
