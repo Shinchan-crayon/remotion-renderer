@@ -5,7 +5,7 @@ description: 调用 Remotion 使用 runtime/scenes.json、runtime/style-profile.
 
 # Remotion 渲染成片
 
-这是场景四第 9 步，只能在 `style-consultant` 和 `animation-preset-builder` 完成之后执行。
+这是场景四第 10 步，只能在 `remotion-video-director`、`style-consultant` 和 `animation-preset-builder` 完成之后执行。
 
 调用 Remotion 渲染视频。
 
@@ -13,6 +13,7 @@ description: 调用 Remotion 使用 runtime/scenes.json、runtime/style-profile.
 
 ```text
 runtime/scenes.json
+runtime/director-plan.json
 runtime/style-profile.json
 口播音频.mp3
 ```
@@ -22,14 +23,59 @@ runtime/style-profile.json
 渲染前必须检查：
 
 - 必须存在 `runtime/scenes.json`
+- 必须存在 `runtime/director-plan.json`
 - 必须存在 `runtime/style-profile.json`
 - 必须存在 `口播音频.mp3`
+- `runtime/director-plan.json` 必须包含 `directorPlanVersion`
 - `runtime/style-profile.json` 必须包含 `styleProfileVersion`
 - `runtime/style-profile.json` 必须包含可执行视觉配置，而不是只有中文描述
 
+缺少 runtime/director-plan.json 时，停止渲染，回到 `remotion-video-director`，先生成导演方案。
+
 缺少 runtime/style-profile.json 时，停止渲染，回到 `style-consultant` 和 `animation-preset-builder`，先询问视觉风格并生成配置。
 
-Remotion 模板必须读取 `runtime/style-profile.json` 并把其中的 `visualFoundation`、`motionSystem`、`effectsSystem`、`transitionSystem` 应用到画面。如果模板没有读取这个文件，禁止继续渲染或交付。
+Remotion 模板必须读取 `runtime/director-plan.json` 和 `runtime/style-profile.json`，并把其中的 `directorType`、`shotStyle`、`cameraMotion`、`visualFoundation`、`motionSystem`、`effectsSystem`、`transitionSystem` 应用到画面。如果模板没有读取这两个文件，禁止继续渲染或交付。
+
+Remotion 模板还必须读取 `runtime/scenes.json` 里每一段的：
+
+```text
+sceneType
+directorType
+shotStyle
+cameraMotion
+visualIntent
+layoutRecipe
+motionVariant
+transition
+visualModules
+pace
+```
+
+渲染时不能再只用正则或固定顺序猜模板。正确方式是：
+
+```text
+scene.sceneType -> 对应场景组件
+directorPlan.scenes[].directorType -> 对应导演镜头组件
+shotStyle / cameraMotion -> 决定镜头运动和空间层次
+motionVariant -> 对应入场、镜头、卡片、关键词动画
+visualModules -> 启用 transforms / layers / transitions / effects / fonts / measuring / randomness / animation math / noise / light leaks / starburst / svg path 等 Remotion 视觉能力
+style-profile.json -> 提供统一主题、色彩、字体、安全区、动效强度和防重复规则
+```
+
+如果一条视频里所有段落都长得一样，或者没有读取 `director-plan.json`、`sceneType` / `motionVariant` / `visualModules`，视为渲染质量检查失败，需要回到 `scene-generator`、`remotion-video-director` 和 `animation-preset-builder` 修正。
+
+## Remotion 官方实现规则
+
+渲染模板必须按 Remotion 官方方式实现：
+
+- 用 `<Sequence>` / `<Series>` 编排每个 scene 的时间，不用普通 React 状态模拟时间轴。
+- 用 `useCurrentFrame()` 读取当前帧。
+- 用 `interpolate()`、`spring()`、`Easing`、`interpolateColors()` 做动画，不用 CSS transition 当作核心动效。
+- 字幕按 captions JSON / caption items 独立渲染，字幕只跟随音频时序，不和主画面卡片绑定。
+- 资源使用 Remotion 支持的静态文件、图片、字体和音频加载方式。
+- 需要图表、关系图、时间线时，封装为可复用组件，不要每个 scene 重写一套 UI。
+- 文字必须限制最大行宽或测量尺寸，避免字幕、图表和标题互相覆盖。
+- 默认不加噪点，不做无意义抖动。
 
 ## 输出
 
@@ -125,6 +171,14 @@ npm run render:final
 - 是否黑屏。
 - 视频时长是否接近口播音频时长。
 - 字幕和主要文字是否明显溢出。
+- 字幕是否固定在底部安全区，且没有和主画面重叠。
+- 主画面是否没有复述完整字幕。
+- 同一条视频内是否至少出现 3 种视觉配方。
+- 同一条视频内是否至少出现 4 种导演镜头或动效组合。
+- 相邻段落是否没有重复使用完全相同的 sceneType 和 motionVariant。
+- Remotion 模板是否真的读取 `runtime/director-plan.json`、`runtime/style-profile.json` 与 `runtime/scenes.json` 的新视觉字段。
+- 是否使用 ffprobe 或等效工具确认音视频流、时长和编码结果。
+- 是否抽取若干关键帧或生成 contact sheet 检查黑屏、溢出、重叠和模板重复。
 
 如果检查失败，先修复再交付。
 
